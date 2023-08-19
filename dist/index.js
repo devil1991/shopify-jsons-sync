@@ -114,7 +114,7 @@ const fetchFiles = (pattern) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.fetchFiles = fetchFiles;
 const fetchLocalFileForRemoteFile = (remoteFile) => __awaiter(void 0, void 0, void 0, function* () {
-    return remoteFile.replace('remote/', '/');
+    return remoteFile.replace('remote/', '');
 });
 const readJsonFile = (file) => __awaiter(void 0, void 0, void 0, function* () {
     if (!(0, fs_1.existsSync)(file)) {

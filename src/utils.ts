@@ -31,7 +31,7 @@ export const fetchFiles = async (pattern: string): Promise<string[]> => {
 const fetchLocalFileForRemoteFile = async (
   remoteFile: string
 ): Promise<string> => {
-  return remoteFile.replace('remote/', '/')
+  return remoteFile.replace('remote/', '')
 }
 
 export const readJsonFile = async (
