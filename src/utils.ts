@@ -53,7 +53,7 @@ export const cleanRemoteFiles = async (): Promise<void> => {
 
 export const sendFilesWithPathToShopify = async (
   files: string[],
-  {targetThemeId, store, password}: ISyncLocalJSONWithRemoteJSONForStore
+  {targetThemeId, store}: ISyncLocalJSONWithRemoteJSONForStore
 ): Promise<string[]> => {
   const pushOnlyCommand = files
     .map(file => `--only=${file.replace('./', '')}`)
@@ -76,8 +76,6 @@ export const sendFilesWithPathToShopify = async (
       targetThemeId,
       '--store',
       store,
-      '--password',
-      password,
       '--path',
       'remote/new'
     ],

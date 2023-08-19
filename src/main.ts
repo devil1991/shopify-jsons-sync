@@ -10,13 +10,12 @@ import {exec} from '@actions/exec'
 
 async function run(): Promise<void> {
   try {
-    const targetThemeId: string = core.getInput('theme')
+    const targetThemeId: string = core.getInput('theme_id')
     const store: string = core.getInput('store')
-    const password: string = core.getInput('password')
 
     await cleanRemoteFiles()
     await exec(
-      `shopify theme pull --only config/*_data.json --only templates/*.json --only locales/*.json --live --path remote --store ${store} --password ${password} --verbose`,
+      `shopify theme pull --only config/*_data.json --only templates/*.json --only locales/*.json --live --path remote --store ${store} --verbose`,
       [],
       EXEC_OPTIONS
     )
@@ -27,8 +26,7 @@ async function run(): Promise<void> {
       [...localeFilesToPush, ...newTemplatesToPush],
       {
         targetThemeId,
-        store,
-        password
+        store
       }
     )
   } catch (error) {

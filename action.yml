@@ -2,10 +2,6 @@ name: 'Shopify Theme JSON Syncs'
 description: 'Sync Shopify Theme JSONs'
 author: 'devil1991'
 inputs:
-  password:
-    required: true
-    description: 'Theme Sectet / Password'
-
   store:
     required: true
     description: 'Store'
