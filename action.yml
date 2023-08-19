@@ -15,4 +15,4 @@ inputs:
     description: 'Target Theme ID'
 runs:
   main: 'dist/index.js'
-  uses: 'node16'
+  using: 'node18'
