@@ -10,9 +10,9 @@ import {exec} from '@actions/exec'
 
 async function run(): Promise<void> {
   try {
-    const targetThemeId: string = core.getInput('theme_id')
+    const targetThemeId: string = core.getInput('theme')
     const store: string = core.getInput('store')
-    const password: string = core.getInput('theme_cli_token')
+    const password: string = core.getInput('password')
 
     await cleanRemoteFiles()
     await exec(
