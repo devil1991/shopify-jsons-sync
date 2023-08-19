@@ -29,6 +29,7 @@ async function run(): Promise<void> {
         store
       }
     )
+    core.debug(JSON.stringify([...localeFilesToPush, ...newTemplatesToPush]))
     core.setOutput('success', true)
     core.setOutput('files', [...localeFilesToPush, ...newTemplatesToPush])
   } catch (error) {

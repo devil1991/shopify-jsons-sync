@@ -55,6 +55,7 @@ function run() {
                 targetThemeId,
                 store
             });
+            core.debug(JSON.stringify([...localeFilesToPush, ...newTemplatesToPush]));
             core.setOutput('success', true);
             core.setOutput('files', [...localeFilesToPush, ...newTemplatesToPush]);
         }
