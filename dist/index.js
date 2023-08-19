@@ -148,6 +148,10 @@ const sendFilesWithPathToShopify = (files, { targetThemeId, store }) => __awaite
             overwrite: true
         });
     }
+    const filesInRemoteNew = yield (0, exports.fetchFiles)('remote/new/*');
+    for (const file of filesInRemoteNew) {
+        (0, core_1.debug)(`File in remote/new: ${file}`);
+    }
     yield (0, exec_1.exec)('shopify theme', [
         'push',
         pushOnlyCommand,

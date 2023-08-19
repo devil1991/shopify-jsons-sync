@@ -71,6 +71,11 @@ export const sendFilesWithPathToShopify = async (
     })
   }
 
+  const filesInRemoteNew = await fetchFiles('remote/new/*')
+  for (const file of filesInRemoteNew) {
+    debug(`File in remote/new: ${file}`)
+  }
+
   await exec(
     'shopify theme',
     [
