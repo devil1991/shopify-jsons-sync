@@ -119,13 +119,7 @@ export const removeDisabledKeys = (
 }
 
 export const syncLocaleAndSettingsJSON = async (): Promise<string[]> => {
-  const remoteFiles = await fetchFiles(
-    [
-      './remote/locales/*.json',
-      './remote/config/*.json',
-      '!./remote/config/settings_data.json'
-    ].join('\n')
-  )
+  const remoteFiles = await fetchFiles(['./remote/locales/*.json'].join('\n'))
 
   for (const remoteFile of remoteFiles) {
     debug(`Remote File: ${remoteFile}`)
