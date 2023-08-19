@@ -57,9 +57,10 @@ export const sendFilesWithPathToShopify = async (
   {targetThemeId, store}: ISyncLocalJSONWithRemoteJSONForStore
 ): Promise<string[]> => {
   const pushOnlyCommand = files
-    .map(file => `--only=${file.replace('./', '')}`)
+    .map(file => `--only=${file.replace('./', '').replace(process.cwd(), '')}`)
     .join(' ')
 
+  debug(pushOnlyCommand)
   rmSync('.shopifyignore')
 
   // for (const file of files) {
