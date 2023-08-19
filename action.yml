@@ -1,6 +1,6 @@
 name: 'Shopify Theme JSON Syncs'
-description: 'Merge Translation JSON's, Settings, Sections Schema (Template JSON) between Live theme and local'
-author: 'Your name or organization here'
+description: 'Sync Shopify Theme JSONs'
+author: 'devil1991'
 inputs:
   password:
     required: true
@@ -12,7 +12,7 @@ inputs:
     required: true
     description: 'Target Theme ID'
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-node@v3
@@ -23,6 +23,6 @@ runs:
         ruby-version: 3.1
         bundler: 'latest'
     - name: Install Shopify CLI
-      run: npm install -g @shopify/cli @shopify/theme
+        run: npm install -g @shopify/cli @shopify/theme
     - name: Sync Theme
-      run: dist/index.js
+        run: dist/index.js
