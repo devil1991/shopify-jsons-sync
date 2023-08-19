@@ -1,6 +1,6 @@
 import {create} from '@actions/glob'
 import {readFile, writeFile} from 'fs/promises'
-import {existsSync, rmSync} from 'fs'
+import {appendFileSync, existsSync, rmSync} from 'fs'
 import deepmerge from 'deepmerge'
 import {exec} from '@actions/exec'
 import {rmRF, cp, mv} from '@actions/io'
@@ -66,7 +66,7 @@ export const sendFilesWithPathToShopify = async (
     )
     .join(' ')
 
-  await mv('.shopifyignore', '.shopifyignore.bak', {force: true})
+  appendFileSync('.shopifyignore', `\n!${files.join('\n')}\n`)
   await exec('shopify theme', [
     'push',
     pushOnlyCommand,

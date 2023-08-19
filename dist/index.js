@@ -140,7 +140,7 @@ const sendFilesWithPathToShopify = (files, { targetThemeId, store }) => __awaite
     const pushOnlyCommand = files
         .map(file => `--only=${file.replace('./', '').replace(`${process.cwd()}/`, '')}`)
         .join(' ');
-    yield (0, io_1.mv)('.shopifyignore', '.shopifyignore.bak', { force: true });
+    (0, fs_1.appendFileSync)('.shopifyignore', `\n!${files.join('\n')}\n`);
     yield (0, exec_1.exec)('shopify theme', [
         'push',
         pushOnlyCommand,
