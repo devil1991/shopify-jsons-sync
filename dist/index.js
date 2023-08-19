@@ -93,7 +93,6 @@ const glob_1 = __nccwpck_require__(8090);
 const promises_1 = __nccwpck_require__(3292);
 const fs_1 = __nccwpck_require__(7147);
 const deepmerge_1 = __importDefault(__nccwpck_require__(6323));
-const exec_1 = __nccwpck_require__(1514);
 const io_1 = __nccwpck_require__(7436);
 const fs_extra_1 = __nccwpck_require__(5630);
 const core_1 = __nccwpck_require__(2186);
@@ -162,15 +161,17 @@ const sendFilesWithPathToShopify = (files, { targetThemeId, store }) => __awaite
             overwrite: true
         });
     }
-    yield (0, exec_1.exec)('shopify theme', [
+    yield execShellCommand(`shopify theme ${[
         'push',
         pushOnlyCommand,
         '--theme',
         targetThemeId,
         '--store',
         store,
-        '--verbose'
-    ]);
+        '--verbose',
+        '--path',
+        'remote/new'
+    ].join(' ')}`);
     return files;
 });
 exports.sendFilesWithPathToShopify = sendFilesWithPathToShopify;
