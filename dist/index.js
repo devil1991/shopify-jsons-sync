@@ -47,15 +47,13 @@ function run() {
         try {
             const targetThemeId = core.getInput('theme_id');
             const store = core.getInput('store');
-            const password = core.getInput('theme_cli_token');
             yield (0, utils_1.cleanRemoteFiles)();
-            yield (0, exec_1.exec)(`shopify theme pull --only config/*_data.json --only templates/*.json --only locales/*.json --live --path remote --store ${store} --password ${password} --verbose`, [], utils_1.EXEC_OPTIONS);
+            yield (0, exec_1.exec)(`shopify theme pull --only config/*_data.json --only templates/*.json --only locales/*.json --live --path remote --store ${store} --verbose`, [], utils_1.EXEC_OPTIONS);
             const localeFilesToPush = yield (0, utils_1.syncLocaleAndSettingsJSON)();
             const newTemplatesToPush = yield (0, utils_1.getNewTemplatesToRemote)();
             yield (0, utils_1.sendFilesWithPathToShopify)([...localeFilesToPush, ...newTemplatesToPush], {
                 targetThemeId,
-                store,
-                password
+                store
             });
         }
         catch (error) {
@@ -135,7 +133,7 @@ const cleanRemoteFiles = () => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.cleanRemoteFiles = cleanRemoteFiles;
-const sendFilesWithPathToShopify = (files, { targetThemeId, store, password }) => __awaiter(void 0, void 0, void 0, function* () {
+const sendFilesWithPathToShopify = (files, { targetThemeId, store }) => __awaiter(void 0, void 0, void 0, function* () {
     const pushOnlyCommand = files
         .map(file => `--only=${file.replace('./', '')}`)
         .join(' ');
@@ -153,8 +151,6 @@ const sendFilesWithPathToShopify = (files, { targetThemeId, store, password }) =
         targetThemeId,
         '--store',
         store,
-        '--password',
-        password,
         '--path',
         'remote/new'
     ], exports.EXEC_OPTIONS);
