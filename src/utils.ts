@@ -3,7 +3,8 @@ import {readFile, writeFile} from 'fs/promises'
 import {existsSync} from 'fs'
 import deepmerge from 'deepmerge'
 import {exec} from '@actions/exec'
-import {cp, rmRF} from '@actions/io'
+import {rmRF} from '@actions/io'
+import {copySync} from 'fs-extra'
 import {debug, error as errorLog} from '@actions/core'
 import {
   ShopifySettingsOrTemplateJSON,
@@ -64,9 +65,8 @@ export const sendFilesWithPathToShopify = async (
     const baseFile = file.replace(process.cwd(), '')
     const destination = `${process.cwd()}/remote/new/${baseFile}`
     debug(`Copying ${file} to ${destination}`)
-    await cp(file, destination, {
-      recursive: true,
-      force: true
+    copySync(file, destination, {
+      overwrite: true
     })
   }
 
