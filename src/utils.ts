@@ -1,15 +1,16 @@
 import {create} from '@actions/glob'
 import {readFile, writeFile} from 'fs/promises'
-import {appendFileSync, existsSync, rmSync} from 'fs'
+import {existsSync, rmSync} from 'fs'
 import deepmerge from 'deepmerge'
 import {exec} from '@actions/exec'
-import {rmRF, cp, mv} from '@actions/io'
+import {rmRF, cp} from '@actions/io'
 import {copySync} from 'fs-extra'
 import {debug, error as errorLog} from '@actions/core'
 import {
   ShopifySettingsOrTemplateJSON,
   ISyncLocalJSONWithRemoteJSONForStore
 } from './types.d'
+import {ExecException, exec as nativeExec} from 'child_process'
 
 export const EXEC_OPTIONS = {
   listeners: {
@@ -52,6 +53,20 @@ export const cleanRemoteFiles = async (): Promise<void> => {
   }
 }
 
+export async function execShellCommand(cmd: string): Promise<string | Buffer> {
+  return new Promise((resolve, reject) => {
+    nativeExec(
+      cmd,
+      (error: ExecException | null, stdout: string, stderr: string) => {
+        if (error) {
+          return reject(error)
+        }
+        resolve(stdout ? stdout : stderr)
+      }
+    )
+  })
+}
+
 export const sendFilesWithPathToShopify = async (
   files: string[],
   {targetThemeId, store}: ISyncLocalJSONWithRemoteJSONForStore
@@ -66,7 +81,14 @@ export const sendFilesWithPathToShopify = async (
     )
     .join(' ')
 
-  appendFileSync('.shopifyignore', `\n!${files.join('\n')}\n`)
+  for (const file of files) {
+    const baseFile = file.replace(process.cwd(), '')
+    const destination = `${process.cwd()}/remote/new/${baseFile}`
+    copySync(file, destination, {
+      overwrite: true
+    })
+  }
+
   await exec('shopify theme', [
     'push',
     pushOnlyCommand,
