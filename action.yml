@@ -1,11 +1,30 @@
-name: 'Your name here'
-description: 'Provide a description here'
+name: 'Shopify Theme JSON Syncs'
+description: 'Merge Translation JSON's, Settings, Sections Schema (Template JSON) between Live theme and local'
 author: 'Your name or organization here'
 inputs:
-  milliseconds: # change this
+  theme_cli_token:
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+    description: 'Theme Sectet / Password'
+  store:
+    required: true
+    description: 'Store'
+  theme_id:
+    required: true
+    description: 'Target Theme ID'
 runs:
-  using: 'node16'
-  main: 'dist/index.js'
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 3.1
+        bundler: 'latest'
+    - name: Install Shopify CLI
+      run: npm install -g @shopify/cli @shopify/theme
+    - name: Deploy theme
+      env:
+        SHOPIFY_CLI_THEME_TOKEN: ${{ inputs.theme_cli_token }}
+      run: dist/index.js

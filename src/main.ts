@@ -1,18 +1,40 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import {
+  EXEC_OPTIONS,
+  cleanRemoteFiles,
+  getNewTemplatesToRemote,
+  sendFilesWithPathToShopify,
+  syncLocaleAndSettingsJSON
+} from './utils'
+import {exec} from '@actions/exec'
 
 async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
+    const targetThemeId: string = core.getInput('theme_id')
+    const store: string = core.getInput('store')
+    const password: string = core.getInput('theme_cli_token')
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    await cleanRemoteFiles()
+    await exec(
+      `shopify theme pull --only config/*_data.json --only templates/*.json --only locales/*.json --live --path remote --store ${store} --password ${password} --verbose`,
+      [],
+      EXEC_OPTIONS
+    )
 
-    core.setOutput('time', new Date().toTimeString())
+    const localeFilesToPush = await syncLocaleAndSettingsJSON()
+    const newTemplatesToPush = await getNewTemplatesToRemote()
+    await sendFilesWithPathToShopify(
+      [...localeFilesToPush, ...newTemplatesToPush],
+      {
+        targetThemeId,
+        store,
+        password
+      }
+    )
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
+  } finally {
+    await cleanRemoteFiles()
   }
 }
 
