@@ -3,7 +3,7 @@ import {readFile, writeFile} from 'fs/promises'
 import {existsSync, rmSync} from 'fs'
 import deepmerge from 'deepmerge'
 import {exec} from '@actions/exec'
-import {rmRF, cp} from '@actions/io'
+import {rmRF, cp, mv} from '@actions/io'
 import {copySync} from 'fs-extra'
 import {debug, error as errorLog} from '@actions/core'
 import {
@@ -62,22 +62,11 @@ export const sendFilesWithPathToShopify = async (
   const pushOnlyCommand = files
     .map(
       file =>
-        `--only=remote/new/${file
-          .replace('./', '')
-          .replace(`${process.cwd()}/`, '')}`
+        `--only=${file.replace('./', '').replace(`${process.cwd()}/`, '')}`
     )
     .join(' ')
 
-  await rmRF('./.shopifyignore')
-
-  for (const file of files) {
-    const baseFile = file.replace(process.cwd(), '')
-    const destination = `${process.cwd()}/remote/new/${baseFile}`
-    copySync(file, destination, {
-      overwrite: true
-    })
-  }
-
+  await mv('.shopifyignore', '.shopifyignore.bak', {force: true})
   await exec('shopify theme', [
     'push',
     pushOnlyCommand,
