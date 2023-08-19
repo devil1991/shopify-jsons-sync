@@ -138,7 +138,7 @@ const cleanRemoteFiles = () => __awaiter(void 0, void 0, void 0, function* () {
 exports.cleanRemoteFiles = cleanRemoteFiles;
 const sendFilesWithPathToShopify = (files, { targetThemeId, store }) => __awaiter(void 0, void 0, void 0, function* () {
     const pushOnlyCommand = files
-        .map(file => `--only=${file.replace('./', '').replace(process.cwd(), '')}`)
+        .map(file => `--only=${file.replace('./', '').replace(`${process.cwd()}/`, '')}`)
         .join(' ');
     (0, core_1.debug)(pushOnlyCommand);
     (0, fs_1.rmSync)('.shopifyignore');
