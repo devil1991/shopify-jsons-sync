@@ -114,6 +114,7 @@ export const syncLocaleAndSettingsJSON = async (): Promise<string[]> => {
     // Read JSON for Remote File
     const remoteFile = await readJsonFile(file)
     debug(`Remote File: ${file}`)
+
     // Get Local Version of File Path
     const localFileRef = await fetchLocalFileForRemoteFile(file)
     debug(`Local File Ref: ${localFileRef}`)
