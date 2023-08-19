@@ -62,17 +62,19 @@ export const sendFilesWithPathToShopify = async (
   const pushOnlyCommand = files
     .map(
       file =>
-        `--only=${file.replace('./', '').replace(`${process.cwd()}/`, '')}`
+        `--only=remote/new/${file
+          .replace('./', '')
+          .replace(`${process.cwd()}/`, '')}`
     )
     .join(' ')
 
-  for (const file of files) {
-    const baseFile = file.replace(process.cwd(), '')
-    const destination = `${process.cwd()}/remote/new/${baseFile}`
-    copySync(file, destination, {
-      overwrite: true
-    })
-  }
+  // for (const file of files) {
+  //   const baseFile = file.replace(process.cwd(), '')
+  //   const destination = `${process.cwd()}/remote/new/${baseFile}`
+  //   copySync(file, destination, {
+  //     overwrite: true
+  //   })
+  // }
 
   await exec('shopify theme', [
     'push',
@@ -81,8 +83,7 @@ export const sendFilesWithPathToShopify = async (
     targetThemeId,
     '--store',
     store,
-    '--path',
-    `./remote/new`
+    '--verbose'
   ])
 
   return files
