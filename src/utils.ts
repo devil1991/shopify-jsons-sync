@@ -60,7 +60,10 @@ export const sendFilesWithPathToShopify = async (
     .join(' ')
 
   for (const file of files) {
-    const destination = `remote/new/${file.replace('./', '')}`
+    debug(process.cwd())
+    const baseFile = file.replace(process.cwd(), '')
+    const destination = `${process.cwd()}/remote/new/${baseFile}`
+    debug(`Copying ${file} to ${destination}`)
     await cp(file, destination, {
       recursive: true,
       force: true

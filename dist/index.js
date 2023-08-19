@@ -138,7 +138,10 @@ const sendFilesWithPathToShopify = (files, { targetThemeId, store }) => __awaite
         .map(file => `--only=${file.replace('./', '')}`)
         .join(' ');
     for (const file of files) {
-        const destination = `remote/new/${file.replace('./', '')}`;
+        (0, core_1.debug)(process.cwd());
+        const baseFile = file.replace(process.cwd(), '');
+        const destination = `${process.cwd()}/remote/new/${baseFile}`;
+        (0, core_1.debug)(`Copying ${file} to ${destination}`);
         yield (0, io_1.cp)(file, destination, {
             recursive: true,
             force: true
