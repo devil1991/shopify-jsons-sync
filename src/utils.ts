@@ -63,7 +63,13 @@ export const sendFilesWithPathToShopify = async (
     )
     .join(' ')
 
-  rmSync('.shopifyignore')
+  for (const file of files) {
+    const baseFile = file.replace(process.cwd(), '')
+    const destination = `${process.cwd()}/remote/new/${baseFile}`
+    copySync(file, destination, {
+      overwrite: true
+    })
+  }
 
   await exec(
     'shopify theme',
@@ -76,7 +82,10 @@ export const sendFilesWithPathToShopify = async (
       store,
       '--verbose'
     ],
-    EXEC_OPTIONS
+    {
+      ...EXEC_OPTIONS,
+      cwd: `${process.cwd()}/remote/new`
+    }
   )
 
   return files
