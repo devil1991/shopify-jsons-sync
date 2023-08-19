@@ -74,22 +74,16 @@ export const sendFilesWithPathToShopify = async (
     })
   }
 
-  await exec(
-    'shopify theme',
-    [
-      'push',
-      pushOnlyCommand,
-      '--theme',
-      targetThemeId,
-      '--store',
-      store,
-      '--verbose'
-    ],
-    {
-      ...EXEC_OPTIONS,
-      cwd: `${process.cwd()}/remote/new`
-    }
-  )
+  await exec('shopify theme', [
+    'push',
+    pushOnlyCommand,
+    '--theme',
+    targetThemeId,
+    '--store',
+    store,
+    '--path',
+    `./remote/new`
+  ])
 
   return files
 }

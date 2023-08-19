@@ -155,8 +155,9 @@ const sendFilesWithPathToShopify = (files, { targetThemeId, store }) => __awaite
         targetThemeId,
         '--store',
         store,
-        '--verbose'
-    ], Object.assign(Object.assign({}, exports.EXEC_OPTIONS), { cwd: `${process.cwd()}/remote/new` }));
+        '--path',
+        `./remote/new`
+    ]);
     return files;
 });
 exports.sendFilesWithPathToShopify = sendFilesWithPathToShopify;
