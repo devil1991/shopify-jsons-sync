@@ -61,10 +61,8 @@ export const sendFilesWithPathToShopify = async (
     .join(' ')
 
   for (const file of files) {
-    debug(process.cwd())
     const baseFile = file.replace(process.cwd(), '')
     const destination = `${process.cwd()}/remote/new/${baseFile}`
-    debug(`Copying ${file} to ${destination}`)
     copySync(file, destination, {
       overwrite: true
     })
@@ -80,7 +78,8 @@ export const sendFilesWithPathToShopify = async (
       '--store',
       store,
       '--path',
-      'remote/new'
+      'remote/new',
+      '--verbose'
     ],
     EXEC_OPTIONS
   )

@@ -29,6 +29,8 @@ async function run(): Promise<void> {
         store
       }
     )
+    core.setOutput('success', true)
+    core.setOutput('files', [...localeFilesToPush, ...newTemplatesToPush])
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   } finally {

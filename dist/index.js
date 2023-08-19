@@ -55,6 +55,8 @@ function run() {
                 targetThemeId,
                 store
             });
+            core.setOutput('success', true);
+            core.setOutput('files', [...localeFilesToPush, ...newTemplatesToPush]);
         }
         catch (error) {
             if (error instanceof Error)
@@ -139,10 +141,8 @@ const sendFilesWithPathToShopify = (files, { targetThemeId, store }) => __awaite
         .map(file => `--only=${file.replace('./', '')}`)
         .join(' ');
     for (const file of files) {
-        (0, core_1.debug)(process.cwd());
         const baseFile = file.replace(process.cwd(), '');
         const destination = `${process.cwd()}/remote/new/${baseFile}`;
-        (0, core_1.debug)(`Copying ${file} to ${destination}`);
         (0, fs_extra_1.copySync)(file, destination, {
             overwrite: true
         });
@@ -155,7 +155,8 @@ const sendFilesWithPathToShopify = (files, { targetThemeId, store }) => __awaite
         '--store',
         store,
         '--path',
-        'remote/new'
+        'remote/new',
+        '--verbose'
     ], exports.EXEC_OPTIONS);
     return files;
 });
