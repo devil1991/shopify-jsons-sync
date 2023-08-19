@@ -45,7 +45,7 @@ const exec_1 = __nccwpck_require__(1514);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const targetThemeId = core.getInput('theme_id');
+            const targetThemeId = core.getInput('theme');
             const store = core.getInput('store');
             yield (0, utils_1.cleanRemoteFiles)();
             yield (0, exec_1.exec)(`shopify theme pull --only config/*_data.json --only templates/*.json --only locales/*.json --live --path remote --store ${store} --verbose`, [], utils_1.EXEC_OPTIONS);
