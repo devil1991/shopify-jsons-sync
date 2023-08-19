@@ -1,9 +1,8 @@
 import {create} from '@actions/glob'
 import {readFile, writeFile} from 'fs/promises'
-import {existsSync, rmSync} from 'fs'
+import {existsSync} from 'fs'
 import deepmerge from 'deepmerge'
-import {exec} from '@actions/exec'
-import {rmRF, cp} from '@actions/io'
+import {rmRF} from '@actions/io'
 import {copySync} from 'fs-extra'
 import {debug, error as errorLog} from '@actions/core'
 import {
@@ -121,7 +120,11 @@ export const removeDisabledKeys = (
 
 export const syncLocaleAndSettingsJSON = async (): Promise<string[]> => {
   const remoteFiles = await fetchFiles(
-    ['./remote/locales/*.json', './remote/config/*.json'].join('\n')
+    [
+      './remote/locales/*.json',
+      './remote/config/*.json',
+      '!./remote/config/settings_data.json'
+    ].join('\n')
   )
 
   for (const remoteFile of remoteFiles) {

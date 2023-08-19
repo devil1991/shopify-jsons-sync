@@ -188,7 +188,11 @@ const removeDisabledKeys = (obj) => {
 };
 exports.removeDisabledKeys = removeDisabledKeys;
 const syncLocaleAndSettingsJSON = () => __awaiter(void 0, void 0, void 0, function* () {
-    const remoteFiles = yield (0, exports.fetchFiles)(['./remote/locales/*.json', './remote/config/*.json'].join('\n'));
+    const remoteFiles = yield (0, exports.fetchFiles)([
+        './remote/locales/*.json',
+        './remote/config/*.json',
+        '!./remote/config/settings_data.json'
+    ].join('\n'));
     for (const remoteFile of remoteFiles) {
         (0, core_1.debug)(`Remote File: ${remoteFile}`);
     }
