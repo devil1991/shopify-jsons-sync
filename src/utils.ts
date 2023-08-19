@@ -108,7 +108,12 @@ export const removeDisabledKeys = (
 }
 
 export const syncLocaleAndSettingsJSON = async (): Promise<string[]> => {
-  const remoteFiles = await fetchFiles('remote/{locales,config}/*.json')
+  const remoteFiles = await fetchFiles(
+    ['./remote/locales/*.json', './remote/config/*.json'].join('\n')
+  )
+  for (const remoteFile of remoteFiles) {
+    debug(`Remote File: ${remoteFile}`)
+  }
   const localFilesToPush: string[] = []
   for (const file of remoteFiles) {
     // Read JSON for Remote File
@@ -143,7 +148,7 @@ export const syncLocaleAndSettingsJSON = async (): Promise<string[]> => {
 
 export const getNewTemplatesToRemote = async (): Promise<string[]> => {
   const remoteTemplateFilesNames = (
-    (await fetchFiles('remote/templates/**/*.json')) || []
+    (await fetchFiles('./remote/templates/**/*.json')) || []
   ).map(file => file.replace('remote/', ''))
 
   const localTemplateFiles = await fetchFiles('./templates/**/*.json')

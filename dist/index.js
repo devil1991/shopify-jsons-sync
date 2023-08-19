@@ -55,9 +55,6 @@ function run() {
                 targetThemeId,
                 store
             });
-            core.debug(JSON.stringify([...localeFilesToPush, ...newTemplatesToPush]));
-            core.setOutput('success', true);
-            core.setOutput('files', [...localeFilesToPush, ...newTemplatesToPush]);
         }
         catch (error) {
             if (error instanceof Error)
@@ -176,7 +173,10 @@ const removeDisabledKeys = (obj) => {
 };
 exports.removeDisabledKeys = removeDisabledKeys;
 const syncLocaleAndSettingsJSON = () => __awaiter(void 0, void 0, void 0, function* () {
-    const remoteFiles = yield (0, exports.fetchFiles)('remote/{locales,config}/*.json');
+    const remoteFiles = yield (0, exports.fetchFiles)(['./remote/locales/*.json', './remote/config/*.json'].join('\n'));
+    for (const remoteFile of remoteFiles) {
+        (0, core_1.debug)(`Remote File: ${remoteFile}`);
+    }
     const localFilesToPush = [];
     for (const file of remoteFiles) {
         // Read JSON for Remote File
@@ -206,7 +206,7 @@ const syncLocaleAndSettingsJSON = () => __awaiter(void 0, void 0, void 0, functi
 });
 exports.syncLocaleAndSettingsJSON = syncLocaleAndSettingsJSON;
 const getNewTemplatesToRemote = () => __awaiter(void 0, void 0, void 0, function* () {
-    const remoteTemplateFilesNames = ((yield (0, exports.fetchFiles)('remote/templates/**/*.json')) || []).map(file => file.replace('remote/', ''));
+    const remoteTemplateFilesNames = ((yield (0, exports.fetchFiles)('./remote/templates/**/*.json')) || []).map(file => file.replace('remote/', ''));
     const localTemplateFiles = yield (0, exports.fetchFiles)('./templates/**/*.json');
     const localeFilesToMove = localTemplateFiles.filter(file => !remoteTemplateFilesNames.includes(file));
     return localeFilesToMove;
