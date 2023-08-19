@@ -31,7 +31,7 @@ export const fetchFiles = async (pattern: string): Promise<string[]> => {
 const fetchLocalFileForRemoteFile = async (
   remoteFile: string
 ): Promise<string> => {
-  return remoteFile.replace('remote/', './')
+  return remoteFile.replace('remote/', '/')
 }
 
 export const readJsonFile = async (
@@ -56,6 +56,9 @@ export const sendFilesWithPathToShopify = async (
   files: string[],
   {targetThemeId, store}: ISyncLocalJSONWithRemoteJSONForStore
 ): Promise<string[]> => {
+  for (const file of files) {
+    debug(`Pushing ${file} to Shopify`)
+  }
   const pushOnlyCommand = files
     .map(
       file =>
@@ -69,12 +72,6 @@ export const sendFilesWithPathToShopify = async (
     copySync(file, destination, {
       overwrite: true
     })
-  }
-
-  const filesInRemoteNew = await fetchFiles('remote/new/*')
-  debug(`Files in remote/new: ${filesInRemoteNew.length}`)
-  for (const file of filesInRemoteNew) {
-    debug(`File in remote/new: ${file}`)
   }
 
   await exec(
@@ -116,10 +113,10 @@ export const syncLocaleAndSettingsJSON = async (): Promise<string[]> => {
   for (const file of remoteFiles) {
     // Read JSON for Remote File
     const remoteFile = await readJsonFile(file)
-
+    debug(`Remote File: ${file}`)
     // Get Local Version of File Path
     const localFileRef = await fetchLocalFileForRemoteFile(file)
-
+    debug(`Local File Ref: ${localFileRef}`)
     // Read JSON for Local File
     const localFile = await readJsonFile(localFileRef)
 

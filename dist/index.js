@@ -117,7 +117,7 @@ const fetchFiles = (pattern) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.fetchFiles = fetchFiles;
 const fetchLocalFileForRemoteFile = (remoteFile) => __awaiter(void 0, void 0, void 0, function* () {
-    return remoteFile.replace('remote/', './');
+    return remoteFile.replace('remote/', '/');
 });
 const readJsonFile = (file) => __awaiter(void 0, void 0, void 0, function* () {
     if (!(0, fs_1.existsSync)(file)) {
@@ -138,6 +138,9 @@ const cleanRemoteFiles = () => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.cleanRemoteFiles = cleanRemoteFiles;
 const sendFilesWithPathToShopify = (files, { targetThemeId, store }) => __awaiter(void 0, void 0, void 0, function* () {
+    for (const file of files) {
+        (0, core_1.debug)(`Pushing ${file} to Shopify`);
+    }
     const pushOnlyCommand = files
         .map(file => `--only=${file.replace('./', '').replace(`${process.cwd()}/`, '')}`)
         .join(' ');
@@ -147,10 +150,6 @@ const sendFilesWithPathToShopify = (files, { targetThemeId, store }) => __awaite
         (0, fs_extra_1.copySync)(file, destination, {
             overwrite: true
         });
-    }
-    const filesInRemoteNew = yield (0, exports.fetchFiles)('remote/new/*');
-    for (const file of filesInRemoteNew) {
-        (0, core_1.debug)(`File in remote/new: ${file}`);
     }
     yield (0, exec_1.exec)('shopify theme', [
         'push',
@@ -182,8 +181,10 @@ const syncLocaleAndSettingsJSON = () => __awaiter(void 0, void 0, void 0, functi
     for (const file of remoteFiles) {
         // Read JSON for Remote File
         const remoteFile = yield (0, exports.readJsonFile)(file);
+        (0, core_1.debug)(`Remote File: ${file}`);
         // Get Local Version of File Path
         const localFileRef = yield fetchLocalFileForRemoteFile(file);
+        (0, core_1.debug)(`Local File Ref: ${localFileRef}`);
         // Read JSON for Local File
         const localFile = yield (0, exports.readJsonFile)(localFileRef);
         // Merge Local and Remote Files with Remote as Primary
