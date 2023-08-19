@@ -148,6 +148,7 @@ const sendFilesWithPathToShopify = (files, { targetThemeId, store }) => __awaite
             overwrite: true
         });
     }
+    process.chdir(`${process.cwd()}/remote/new`);
     yield (0, exec_1.exec)('shopify theme', [
         'push',
         pushOnlyCommand,
@@ -155,8 +156,6 @@ const sendFilesWithPathToShopify = (files, { targetThemeId, store }) => __awaite
         targetThemeId,
         '--store',
         store,
-        '--path',
-        'remote/new',
         '--verbose'
     ], exports.EXEC_OPTIONS);
     return files;

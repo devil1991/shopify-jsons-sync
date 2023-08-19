@@ -71,6 +71,8 @@ export const sendFilesWithPathToShopify = async (
     })
   }
 
+  process.chdir(`${process.cwd()}/remote/new`)
+
   await exec(
     'shopify theme',
     [
@@ -80,8 +82,6 @@ export const sendFilesWithPathToShopify = async (
       targetThemeId,
       '--store',
       store,
-      '--path',
-      'remote/new',
       '--verbose'
     ],
     EXEC_OPTIONS
