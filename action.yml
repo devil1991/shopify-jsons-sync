@@ -32,5 +32,4 @@ runs:
       run: npm install -g @shopify/cli @shopify/theme
 
     - name: Sync Theme
-      run: dist/index.js
-      shell: bash
+      run: node index.js --prefix=dist
