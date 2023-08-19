@@ -72,6 +72,7 @@ export const sendFilesWithPathToShopify = async (
   }
 
   const filesInRemoteNew = await fetchFiles('remote/new/*')
+  debug(`Files in remote/new: ${filesInRemoteNew.length}`)
   for (const file of filesInRemoteNew) {
     debug(`File in remote/new: ${file}`)
   }
