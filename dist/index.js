@@ -188,38 +188,43 @@ const removeDisabledKeys = (obj) => {
 };
 exports.removeDisabledKeys = removeDisabledKeys;
 const syncLocaleAndSettingsJSON = () => __awaiter(void 0, void 0, void 0, function* () {
-    const remoteFiles = yield (0, exports.fetchFiles)([
-        './remote/locales/*.json',
-        './remote/config/*.json',
-        '!./remote/config/settings_data.json'
-    ].join('\n'));
+    const remoteFiles = yield (0, exports.fetchFiles)(['./remote/locales/*.json'].join('\n'));
     for (const remoteFile of remoteFiles) {
         (0, core_1.debug)(`Remote File: ${remoteFile}`);
     }
     const localFilesToPush = [];
     for (const file of remoteFiles) {
-        // Read JSON for Remote File
-        const remoteFile = yield (0, exports.readJsonFile)(file);
-        (0, core_1.debug)(`Remote File: ${file}`);
-        // Get Local Version of File Path
-        const localFileRef = yield fetchLocalFileForRemoteFile(file);
-        (0, core_1.debug)(`Local File Ref: ${localFileRef}`);
-        // Read JSON for Local File
-        const localFile = yield (0, exports.readJsonFile)(localFileRef);
-        // Merge Local and Remote Files with Remote as Primary
-        const mergedFile = (0, deepmerge_1.default)(localFile, remoteFile, {
-            arrayMerge: (_, sourceArray) => sourceArray,
-            customMerge: key => {
-                if (key === 'blocks') {
-                    return (_, newBlock) => {
-                        return (0, exports.removeDisabledKeys)(newBlock);
-                    };
+        try {
+            // Read JSON for Remote File
+            const remoteFile = yield (0, exports.readJsonFile)(file);
+            (0, core_1.debug)(`Remote File: ${file}`);
+            // Get Local Version of File Path
+            const localFileRef = yield fetchLocalFileForRemoteFile(file);
+            (0, core_1.debug)(`Local File Ref: ${localFileRef}`);
+            // Read JSON for Local File
+            const localFile = yield (0, exports.readJsonFile)(localFileRef);
+            // Merge Local and Remote Files with Remote as Primary
+            const mergedFile = (0, deepmerge_1.default)(localFile, remoteFile, {
+                arrayMerge: (_, sourceArray) => sourceArray,
+                customMerge: key => {
+                    if (key === 'blocks') {
+                        return (_, newBlock) => {
+                            return (0, exports.removeDisabledKeys)(newBlock);
+                        };
+                    }
                 }
+            });
+            // Write Merged File to Local File
+            yield (0, promises_1.writeFile)(localFileRef, JSON.stringify(mergedFile, null, 2));
+            localFilesToPush.push(localFileRef);
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                (0, core_1.debug)('Error in syncLocaleAndSettingsJSON');
+                (0, core_1.debug)(error.message);
             }
-        });
-        // Write Merged File to Local File
-        yield (0, promises_1.writeFile)(localFileRef, JSON.stringify(mergedFile, null, 2));
-        localFilesToPush.push(localFileRef);
+            continue;
+        }
     }
     return localFilesToPush;
 });

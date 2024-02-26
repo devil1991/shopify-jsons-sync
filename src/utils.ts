@@ -126,31 +126,39 @@ export const syncLocaleAndSettingsJSON = async (): Promise<string[]> => {
   }
   const localFilesToPush: string[] = []
   for (const file of remoteFiles) {
-    // Read JSON for Remote File
-    const remoteFile = await readJsonFile(file)
-    debug(`Remote File: ${file}`)
+    try {
+      // Read JSON for Remote File
+      const remoteFile = await readJsonFile(file)
+      debug(`Remote File: ${file}`)
 
-    // Get Local Version of File Path
-    const localFileRef = await fetchLocalFileForRemoteFile(file)
-    debug(`Local File Ref: ${localFileRef}`)
-    // Read JSON for Local File
-    const localFile = await readJsonFile(localFileRef)
+      // Get Local Version of File Path
+      const localFileRef = await fetchLocalFileForRemoteFile(file)
+      debug(`Local File Ref: ${localFileRef}`)
+      // Read JSON for Local File
+      const localFile = await readJsonFile(localFileRef)
 
-    // Merge Local and Remote Files with Remote as Primary
-    const mergedFile = deepmerge(localFile, remoteFile, {
-      arrayMerge: (_, sourceArray) => sourceArray,
-      customMerge: key => {
-        if (key === 'blocks') {
-          return (_, newBlock) => {
-            return removeDisabledKeys(newBlock)
+      // Merge Local and Remote Files with Remote as Primary
+      const mergedFile = deepmerge(localFile, remoteFile, {
+        arrayMerge: (_, sourceArray) => sourceArray,
+        customMerge: key => {
+          if (key === 'blocks') {
+            return (_, newBlock) => {
+              return removeDisabledKeys(newBlock)
+            }
           }
         }
-      }
-    })
+      })
 
-    // Write Merged File to Local File
-    await writeFile(localFileRef, JSON.stringify(mergedFile, null, 2))
-    localFilesToPush.push(localFileRef)
+      // Write Merged File to Local File
+      await writeFile(localFileRef, JSON.stringify(mergedFile, null, 2))
+      localFilesToPush.push(localFileRef)
+    } catch (error) {
+      if (error instanceof Error) {
+        debug('Error in syncLocaleAndSettingsJSON')
+        debug(error.message)
+      }
+      continue
+    }
   }
 
   return localFilesToPush
