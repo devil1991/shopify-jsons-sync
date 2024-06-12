@@ -180,7 +180,7 @@ const sendFilesWithPathToShopify = (files, { targetThemeId, store }) => __awaite
         '--path',
         'remote/new',
         '--stable',
-        '--no-delete'
+        '--nodelete'
     ].join(' ')}`);
     return files;
 });

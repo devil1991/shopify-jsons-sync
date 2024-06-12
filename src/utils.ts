@@ -100,7 +100,7 @@ export const sendFilesWithPathToShopify = async (
       '--path',
       'remote/new',
       '--stable',
-      '--no-delete'
+      '--nodelete'
     ].join(' ')}`
   )
 
