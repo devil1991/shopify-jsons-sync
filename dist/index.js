@@ -47,6 +47,12 @@ function run() {
         try {
             const targetThemeId = core.getInput('theme');
             const store = core.getInput('store');
+            const workingDirectory = core.getInput('working-directory', {
+                trimWhitespace: true
+            });
+            if (workingDirectory && workingDirectory !== '') {
+                process.chdir(workingDirectory);
+            }
             yield (0, utils_1.cleanRemoteFiles)();
             yield (0, exec_1.exec)(`shopify theme pull --only config/*_data.json --only templates/*.json --only locales/*.json --live --path remote --store ${store} --verbose`, [], utils_1.EXEC_OPTIONS);
             const localeFilesToPush = yield (0, utils_1.syncLocaleAndSettingsJSON)();
@@ -170,7 +176,8 @@ const sendFilesWithPathToShopify = (files, { targetThemeId, store }) => __awaite
         store,
         '--verbose',
         '--path',
-        'remote/new'
+        'remote/new',
+        '--stable'
     ].join(' ')}`);
     return files;
 });

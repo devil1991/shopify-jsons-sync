@@ -9,6 +9,10 @@ inputs:
   theme:
     required: true
     description: 'Target Theme ID'
+
+  working-directory:
+    required: false
+    description: 'Working Directory'
 runs:
   main: 'dist/index.js'
   using: 'node20'

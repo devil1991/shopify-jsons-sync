@@ -12,6 +12,13 @@ async function run(): Promise<void> {
   try {
     const targetThemeId: string = core.getInput('theme')
     const store: string = core.getInput('store')
+    const workingDirectory: string = core.getInput('working-directory', {
+      trimWhitespace: true
+    })
+
+    if (workingDirectory && workingDirectory !== '') {
+      process.chdir(workingDirectory)
+    }
 
     await cleanRemoteFiles()
     await exec(
