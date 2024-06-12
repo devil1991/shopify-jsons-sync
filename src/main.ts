@@ -7,6 +7,7 @@ import {
   syncLocaleAndSettingsJSON
 } from './utils'
 import {exec} from '@actions/exec'
+import {debug} from '@actions/core'
 
 async function run(): Promise<void> {
   try {
@@ -16,7 +17,8 @@ async function run(): Promise<void> {
       trimWhitespace: true
     })
 
-    if (workingDirectory && workingDirectory !== '') {
+    if (!!workingDirectory && workingDirectory !== '') {
+      debug(`Changing working directory to ${workingDirectory}`)
       process.chdir(workingDirectory)
     }
 

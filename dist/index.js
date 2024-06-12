@@ -42,6 +42,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const utils_1 = __nccwpck_require__(918);
 const exec_1 = __nccwpck_require__(1514);
+const core_1 = __nccwpck_require__(2186);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -50,7 +51,8 @@ function run() {
             const workingDirectory = core.getInput('working-directory', {
                 trimWhitespace: true
             });
-            if (workingDirectory && workingDirectory !== '') {
+            if (!!workingDirectory && workingDirectory !== '') {
+                (0, core_1.debug)(`Changing working directory to ${workingDirectory}`);
                 process.chdir(workingDirectory);
             }
             yield (0, utils_1.cleanRemoteFiles)();
