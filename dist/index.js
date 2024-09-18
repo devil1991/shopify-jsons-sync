@@ -179,7 +179,6 @@ const sendFilesWithPathToShopify = (files, { targetThemeId, store }) => __awaite
         '--verbose',
         '--path',
         'remote/new',
-        '--stable',
         '--nodelete'
     ].join(' ')}`);
     return files;
