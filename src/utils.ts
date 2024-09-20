@@ -34,6 +34,17 @@ const fetchLocalFileForRemoteFile = async (
   return remoteFile.replace('remote/', '')
 }
 
+const cleanJSONStringofShopifyComment = (jsonString: string): string => {
+  try {
+    return jsonString.replace(/\/\*.*?\*\//s, '').trim()
+  } catch (error) {
+    if (error instanceof Error) {
+      debug(error.message)
+    }
+    return jsonString
+  }
+}
+
 export const readJsonFile = async (
   file: string
 ): Promise<ShopifySettingsOrTemplateJSON> => {
@@ -41,7 +52,7 @@ export const readJsonFile = async (
     return {} // Return empty object if file doesn't exist
   }
   const buffer = await readFile(file)
-  return JSON.parse(buffer.toString())
+  return JSON.parse(cleanJSONStringofShopifyComment(buffer.toString()))
 }
 
 export const cleanRemoteFiles = async (): Promise<void> => {

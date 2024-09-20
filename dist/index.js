@@ -29,49 +29,38 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const utils_1 = __nccwpck_require__(918);
 const exec_1 = __nccwpck_require__(1514);
 const core_1 = __nccwpck_require__(2186);
-function run() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const targetThemeId = core.getInput('theme');
-            const store = core.getInput('store');
-            const workingDirectory = core.getInput('working-directory', {
-                trimWhitespace: true
-            });
-            if (!!workingDirectory && workingDirectory !== '') {
-                (0, core_1.debug)(`Changing working directory to ${workingDirectory}`);
-                process.chdir(workingDirectory);
-            }
-            yield (0, utils_1.cleanRemoteFiles)();
-            yield (0, exec_1.exec)(`shopify theme pull --only config/*_data.json --only templates/*.json --only locales/*.json --live --path remote --store ${store} --verbose`, [], utils_1.EXEC_OPTIONS);
-            const localeFilesToPush = yield (0, utils_1.syncLocaleAndSettingsJSON)();
-            const newTemplatesToPush = yield (0, utils_1.getNewTemplatesToRemote)();
-            yield (0, utils_1.sendFilesWithPathToShopify)([...localeFilesToPush, ...newTemplatesToPush], {
-                targetThemeId,
-                store
-            });
+async function run() {
+    try {
+        const targetThemeId = core.getInput('theme');
+        const store = core.getInput('store');
+        const workingDirectory = core.getInput('working-directory', {
+            trimWhitespace: true
+        });
+        if (!!workingDirectory && workingDirectory !== '') {
+            (0, core_1.debug)(`Changing working directory to ${workingDirectory}`);
+            process.chdir(workingDirectory);
         }
-        catch (error) {
-            if (error instanceof Error)
-                core.setFailed(error.message);
-        }
-        finally {
-            yield (0, utils_1.cleanRemoteFiles)();
-        }
-    });
+        await (0, utils_1.cleanRemoteFiles)();
+        await (0, exec_1.exec)(`shopify theme pull --only config/*_data.json --only templates/*.json --only locales/*.json --live --path remote --store ${store} --verbose`, [], utils_1.EXEC_OPTIONS);
+        const localeFilesToPush = await (0, utils_1.syncLocaleAndSettingsJSON)();
+        const newTemplatesToPush = await (0, utils_1.getNewTemplatesToRemote)();
+        await (0, utils_1.sendFilesWithPathToShopify)([...localeFilesToPush, ...newTemplatesToPush], {
+            targetThemeId,
+            store
+        });
+    }
+    catch (error) {
+        if (error instanceof Error)
+            core.setFailed(error.message);
+    }
+    finally {
+        await (0, utils_1.cleanRemoteFiles)();
+    }
 }
 run();
 
@@ -83,15 +72,6 @@ run();
 
 "use strict";
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -115,24 +95,35 @@ exports.EXEC_OPTIONS = {
         }
     }
 };
-const fetchFiles = (pattern) => __awaiter(void 0, void 0, void 0, function* () {
-    const globber = yield (0, glob_1.create)(pattern);
-    const files = yield globber.glob();
+const fetchFiles = async (pattern) => {
+    const globber = await (0, glob_1.create)(pattern);
+    const files = await globber.glob();
     return files;
-});
+};
 exports.fetchFiles = fetchFiles;
-const fetchLocalFileForRemoteFile = (remoteFile) => __awaiter(void 0, void 0, void 0, function* () {
+const fetchLocalFileForRemoteFile = async (remoteFile) => {
     return remoteFile.replace('remote/', '');
-});
-const readJsonFile = (file) => __awaiter(void 0, void 0, void 0, function* () {
+};
+const cleanJSONStringofShopifyComment = (jsonString) => {
+    try {
+        return jsonString.replace(/\/\*.*?\*\//s, '').trim();
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            (0, core_1.debug)(error.message);
+        }
+        return jsonString;
+    }
+};
+const readJsonFile = async (file) => {
     if (!(0, fs_1.existsSync)(file)) {
         return {}; // Return empty object if file doesn't exist
     }
-    const buffer = yield (0, promises_1.readFile)(file);
-    return JSON.parse(buffer.toString());
-});
+    const buffer = await (0, promises_1.readFile)(file);
+    return JSON.parse(cleanJSONStringofShopifyComment(buffer.toString()));
+};
 exports.readJsonFile = readJsonFile;
-const cleanRemoteFiles = () => __awaiter(void 0, void 0, void 0, function* () {
+const cleanRemoteFiles = async () => {
     try {
         (0, io_1.rmRF)('remote');
     }
@@ -140,22 +131,20 @@ const cleanRemoteFiles = () => __awaiter(void 0, void 0, void 0, function* () {
         if (error instanceof Error)
             (0, core_1.debug)(error.message);
     }
-});
+};
 exports.cleanRemoteFiles = cleanRemoteFiles;
-function execShellCommand(cmd) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return new Promise((resolve, reject) => {
-            (0, child_process_1.exec)(cmd, (error, stdout, stderr) => {
-                if (error) {
-                    return reject(error);
-                }
-                resolve(stdout ? stdout : stderr);
-            });
+async function execShellCommand(cmd) {
+    return new Promise((resolve, reject) => {
+        (0, child_process_1.exec)(cmd, (error, stdout, stderr) => {
+            if (error) {
+                return reject(error);
+            }
+            resolve(stdout ? stdout : stderr);
         });
     });
 }
 exports.execShellCommand = execShellCommand;
-const sendFilesWithPathToShopify = (files, { targetThemeId, store }) => __awaiter(void 0, void 0, void 0, function* () {
+const sendFilesWithPathToShopify = async (files, { targetThemeId, store }) => {
     for (const file of files) {
         (0, core_1.debug)(`Pushing ${file} to Shopify`);
     }
@@ -169,7 +158,7 @@ const sendFilesWithPathToShopify = (files, { targetThemeId, store }) => __awaite
             overwrite: true
         });
     }
-    yield execShellCommand(`shopify theme ${[
+    await execShellCommand(`shopify theme ${[
         'push',
         pushOnlyCommand,
         '--theme',
@@ -182,22 +171,21 @@ const sendFilesWithPathToShopify = (files, { targetThemeId, store }) => __awaite
         '--nodelete'
     ].join(' ')}`);
     return files;
-});
+};
 exports.sendFilesWithPathToShopify = sendFilesWithPathToShopify;
 // Go throgh all keys in the object and a key which has disabled: true, remove it from the object
 const removeDisabledKeys = (obj) => {
-    var _a;
-    const newObj = Object.assign({}, obj);
+    const newObj = { ...obj };
     for (const key in obj) {
-        if ((_a = newObj[key]) === null || _a === void 0 ? void 0 : _a.hasOwnProperty('disabled')) {
+        if (newObj[key]?.hasOwnProperty('disabled')) {
             delete newObj[key];
         }
     }
     return newObj;
 };
 exports.removeDisabledKeys = removeDisabledKeys;
-const syncLocaleAndSettingsJSON = () => __awaiter(void 0, void 0, void 0, function* () {
-    const remoteFiles = yield (0, exports.fetchFiles)(['./remote/locales/*.json'].join('\n'));
+const syncLocaleAndSettingsJSON = async () => {
+    const remoteFiles = await (0, exports.fetchFiles)(['./remote/locales/*.json'].join('\n'));
     for (const remoteFile of remoteFiles) {
         (0, core_1.debug)(`Remote File: ${remoteFile}`);
     }
@@ -205,13 +193,13 @@ const syncLocaleAndSettingsJSON = () => __awaiter(void 0, void 0, void 0, functi
     for (const file of remoteFiles) {
         try {
             // Read JSON for Remote File
-            const remoteFile = yield (0, exports.readJsonFile)(file);
+            const remoteFile = await (0, exports.readJsonFile)(file);
             (0, core_1.debug)(`Remote File: ${file}`);
             // Get Local Version of File Path
-            const localFileRef = yield fetchLocalFileForRemoteFile(file);
+            const localFileRef = await fetchLocalFileForRemoteFile(file);
             (0, core_1.debug)(`Local File Ref: ${localFileRef}`);
             // Read JSON for Local File
-            const localFile = yield (0, exports.readJsonFile)(localFileRef);
+            const localFile = await (0, exports.readJsonFile)(localFileRef);
             // Merge Local and Remote Files with Remote as Primary
             const mergedFile = (0, deepmerge_1.default)(localFile, remoteFile, {
                 arrayMerge: (_, sourceArray) => sourceArray,
@@ -224,7 +212,7 @@ const syncLocaleAndSettingsJSON = () => __awaiter(void 0, void 0, void 0, functi
                 }
             });
             // Write Merged File to Local File
-            yield (0, promises_1.writeFile)(localFileRef, JSON.stringify(mergedFile, null, 2));
+            await (0, promises_1.writeFile)(localFileRef, JSON.stringify(mergedFile, null, 2));
             localFilesToPush.push(localFileRef);
         }
         catch (error) {
@@ -236,14 +224,14 @@ const syncLocaleAndSettingsJSON = () => __awaiter(void 0, void 0, void 0, functi
         }
     }
     return localFilesToPush;
-});
+};
 exports.syncLocaleAndSettingsJSON = syncLocaleAndSettingsJSON;
-const getNewTemplatesToRemote = () => __awaiter(void 0, void 0, void 0, function* () {
-    const remoteTemplateFilesNames = ((yield (0, exports.fetchFiles)('./remote/templates/**/*.json')) || []).map(file => file.replace('remote/', ''));
-    const localTemplateFiles = yield (0, exports.fetchFiles)('./templates/**/*.json');
+const getNewTemplatesToRemote = async () => {
+    const remoteTemplateFilesNames = ((await (0, exports.fetchFiles)('./remote/templates/**/*.json')) || []).map(file => file.replace('remote/', ''));
+    const localTemplateFiles = await (0, exports.fetchFiles)('./templates/**/*.json');
     const localeFilesToMove = localTemplateFiles.filter(file => !remoteTemplateFilesNames.includes(file));
     return localeFilesToMove;
-});
+};
 exports.getNewTemplatesToRemote = getNewTemplatesToRemote;
 
 
