@@ -24,7 +24,7 @@ async function run(): Promise<void> {
 
     await cleanRemoteFiles()
     await exec(
-      `shopify theme pull --only config/*_data.json --only templates/*.json --only locales/*.json --live --path remote --store ${store} --verbose`,
+      `shopify theme pull --only config/*_data.json --only templates/**/*.json --only locales/*.json --live --path remote --store ${store} --verbose`,
       [],
       EXEC_OPTIONS
     )

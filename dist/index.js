@@ -46,7 +46,7 @@ async function run() {
             process.chdir(workingDirectory);
         }
         await (0, utils_1.cleanRemoteFiles)();
-        await (0, exec_1.exec)(`shopify theme pull --only config/*_data.json --only templates/*.json --only locales/*.json --live --path remote --store ${store} --verbose`, [], utils_1.EXEC_OPTIONS);
+        await (0, exec_1.exec)(`shopify theme pull --only config/*_data.json --only templates/**/*.json --only locales/*.json --live --path remote --store ${store} --verbose`, [], utils_1.EXEC_OPTIONS);
         const localeFilesToPush = await (0, utils_1.syncLocaleAndSettingsJSON)();
         const newTemplatesToPush = await (0, utils_1.getNewTemplatesToRemote)();
         await (0, utils_1.sendFilesWithPathToShopify)([...localeFilesToPush, ...newTemplatesToPush], {
@@ -85,6 +85,7 @@ const io_1 = __nccwpck_require__(7436);
 const fs_extra_1 = __nccwpck_require__(5630);
 const core_1 = __nccwpck_require__(2186);
 const child_process_1 = __nccwpck_require__(2081);
+const json_parse_safe_1 = __importDefault(__nccwpck_require__(2114));
 exports.EXEC_OPTIONS = {
     listeners: {
         stdout: (data) => {
@@ -104,15 +105,29 @@ exports.fetchFiles = fetchFiles;
 const fetchLocalFileForRemoteFile = async (remoteFile) => {
     return remoteFile.replace('remote/', '');
 };
+// Remove this from JSONString before parsing
+// /*
+// * ------------------------------------------------------------
+// * IMPORTANT: The contents of this file are auto-generated.
+// *
+// * This file may be updated by the Shopify admin language editor
+// * or related systems. Please exercise caution as any changes
+// * made to this file may be overwritten.
+// * ------------------------------------------------------------
+// */
 const cleanJSONStringofShopifyComment = (jsonString) => {
     try {
-        return jsonString.replace(/\/\*.*?\*\//s, '').trim();
+        const parsed = (0, json_parse_safe_1.default)(jsonString);
+        if (parsed && 'value' in parsed) {
+            return parsed.value;
+        }
+        throw new Error('JSON Parse Error');
     }
     catch (error) {
         if (error instanceof Error) {
             (0, core_1.debug)(error.message);
         }
-        return jsonString;
+        return JSON.parse(jsonString);
     }
 };
 const readJsonFile = async (file) => {
@@ -120,7 +135,7 @@ const readJsonFile = async (file) => {
         return {}; // Return empty object if file doesn't exist
     }
     const buffer = await (0, promises_1.readFile)(file);
-    return JSON.parse(cleanJSONStringofShopifyComment(buffer.toString()));
+    return cleanJSONStringofShopifyComment(buffer.toString());
 };
 exports.readJsonFile = readJsonFile;
 const cleanRemoteFiles = async () => {
@@ -7509,6 +7524,29 @@ function patch (fs) {
     }
 
     return false
+  }
+}
+
+
+/***/ }),
+
+/***/ 2114:
+/***/ ((module) => {
+
+"use strict";
+
+
+module.exports = JSONParse
+
+function JSONParse (text, reviver) {
+  try {
+    return {
+      value: JSON.parse(text, reviver)
+    }
+  } catch (ex) {
+    return {
+      error: ex
+    }
   }
 }
 

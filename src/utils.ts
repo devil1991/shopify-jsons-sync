@@ -10,6 +10,7 @@ import {
   ISyncLocalJSONWithRemoteJSONForStore
 } from './types.d'
 import {ExecException, exec as nativeExec} from 'child_process'
+import JSONParser from 'json-parse-safe'
 
 export const EXEC_OPTIONS = {
   listeners: {
@@ -34,14 +35,32 @@ const fetchLocalFileForRemoteFile = async (
   return remoteFile.replace('remote/', '')
 }
 
-const cleanJSONStringofShopifyComment = (jsonString: string): string => {
+// Remove this from JSONString before parsing
+// /*
+// * ------------------------------------------------------------
+// * IMPORTANT: The contents of this file are auto-generated.
+// *
+// * This file may be updated by the Shopify admin language editor
+// * or related systems. Please exercise caution as any changes
+// * made to this file may be overwritten.
+// * ------------------------------------------------------------
+// */
+
+const cleanJSONStringofShopifyComment = (
+  jsonString: string
+): ShopifySettingsOrTemplateJSON => {
   try {
-    return jsonString.replace(/\/\*.*?\*\//s, '').trim()
+    const parsed = JSONParser(jsonString)
+    if (parsed && 'value' in parsed) {
+      return parsed.value as ShopifySettingsOrTemplateJSON
+    }
+
+    throw new Error('JSON Parse Error')
   } catch (error) {
     if (error instanceof Error) {
       debug(error.message)
     }
-    return jsonString
+    return JSON.parse(jsonString)
   }
 }
 
@@ -52,7 +71,7 @@ export const readJsonFile = async (
     return {} // Return empty object if file doesn't exist
   }
   const buffer = await readFile(file)
-  return JSON.parse(cleanJSONStringofShopifyComment(buffer.toString()))
+  return cleanJSONStringofShopifyComment(buffer.toString())
 }
 
 export const cleanRemoteFiles = async (): Promise<void> => {
