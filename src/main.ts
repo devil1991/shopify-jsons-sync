@@ -8,7 +8,9 @@ import {
 } from './utils'
 import {exec} from '@actions/exec'
 import {debug} from '@actions/core'
+import {mkdirP} from '@actions/io'
 
+const TEMP_FOLDER = 'remote'
 async function run(): Promise<void> {
   try {
     const targetThemeId: string = core.getInput('theme')
@@ -23,8 +25,9 @@ async function run(): Promise<void> {
     }
 
     await cleanRemoteFiles()
+    await mkdirP(TEMP_FOLDER)
     await exec(
-      `npx shopify theme pull --only config/*_data.json --only templates/**/*.json --only locales/*.json --live --path remote --store ${store} --verbose`,
+      `npx shopify theme pull --only config/*_data.json --only templates/**/*.json --only locales/*.json --live --path ${TEMP_FOLDER} --store ${store} --verbose`,
       [],
       EXEC_OPTIONS
     )
