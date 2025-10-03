@@ -4,7 +4,7 @@ import {existsSync} from 'fs'
 import deepmerge from 'deepmerge'
 import {rmRF} from '@actions/io'
 import {copySync} from 'fs-extra'
-import {debug, error as errorLog} from '@actions/core'
+import {debug, error as errorLog, getInput} from '@actions/core'
 import {
   ShopifySettingsOrTemplateJSON,
   ISyncLocalJSONWithRemoteJSONForStore
@@ -129,6 +129,8 @@ export const sendFilesWithPathToShopify = async (
     })
   }
 
+  const allowPublished: string = getInput('allow-published')
+
   await execShellCommand(
     `shopify theme ${[
       'push',
@@ -140,7 +142,8 @@ export const sendFilesWithPathToShopify = async (
       '--verbose',
       '--path',
       'remote/new',
-      '--nodelete'
+      '--nodelete',
+      allowPublished === 'true' ? '--allow-live' : ''
     ].join(' ')}`
   )
 

@@ -23,7 +23,9 @@ A GitHub Action to sync JSON content (locale strings & JSON templates) between t
     theme: '${{ env.TARGET_THEME_ID }}'
 ```
 
-### Advanced Usage (Sync from Specific Source Theme)
+### Advanced Usage
+
+#### Sync from Specific Source Theme
 
 ```yaml
 - uses: devil1991/shopify-jsons-sync@v1.4.2
@@ -31,6 +33,14 @@ A GitHub Action to sync JSON content (locale strings & JSON templates) between t
     store: '${{ env.SHOPIFY_FLAG_STORE }}'
     theme: '${{ env.TARGET_THEME_ID }}'              # Where to push
     source-theme: '${{ env.SOURCE_THEME_ID }}'       # Where to pull from
+```
+
+#### Allow Published Theme Pushes
+```yaml
+- uses: devil1991/shopify-jsons-sync@v1.4.2
+  with:
+    store: '${{ env.SHOPIFY_FLAG_STORE }}'
+    allow-published: 'true'
 ```
 
 ## Inputs
@@ -41,6 +51,7 @@ A GitHub Action to sync JSON content (locale strings & JSON templates) between t
 | `theme` | Yes | - | Target theme ID where files will be pushed to |
 | `source-theme` | No | - | Source theme ID to pull JSON files from (if not provided, pulls from live theme) |
 | `working-directory` | No | - | Working directory path if the action should run in a subdirectory |
+| `allow-published` | No | 'false' | If true, allows pushing to published themes (use with caution) |
 
 ## How It Works
 
@@ -57,6 +68,7 @@ A GitHub Action to sync JSON content (locale strings & JSON templates) between t
    - Pushes merged locale files to the target theme (specified by `theme` parameter)
    - Pushes any new template files that don't exist remotely
    - Always uses the `theme` parameter as the destination
+   - Does not push to live themes unless `allow-published` is set to true
 
 ## Use Cases
 

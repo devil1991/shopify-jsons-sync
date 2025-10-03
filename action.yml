@@ -17,6 +17,11 @@ inputs:
   working-directory:
     required: false
     description: 'Working Directory'
+
+  allow-published:
+    required: false
+    description: 'Allow production theme to be modified'
+    default: 'false'
 runs:
   main: 'dist/index.js'
   using: 'node20'
