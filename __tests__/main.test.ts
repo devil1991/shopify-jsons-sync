@@ -2,7 +2,7 @@ import {wait} from '../src/wait'
 import * as process from 'process'
 import * as cp from 'child_process'
 import * as path from 'path'
-import {expect, test} from '@jest/globals'
+import {expect, test} from 'vitest'
 
 test('throws invalid number', async () => {
   const input = parseInt('foo', 10)
@@ -13,7 +13,7 @@ test('wait 500 ms', async () => {
   const start = new Date()
   await wait(500)
   const end = new Date()
-  var delta = Math.abs(end.getTime() - start.getTime())
+  const delta = Math.abs(end.getTime() - start.getTime())
   expect(delta).toBeGreaterThan(450)
 })
 
@@ -25,4 +25,10 @@ test('test runs', () => {
   const options: cp.ExecFileSyncOptions = {
     env: process.env
   }
+
+  // Basic test that environment is set up correctly
+  expect(process.env['INPUT_MILLISECONDS']).toBe('500')
+  expect(np).toBeDefined()
+  expect(ip).toContain('main.js')
+  expect(options.env).toBeDefined()
 })
