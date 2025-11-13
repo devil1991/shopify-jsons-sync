@@ -53,7 +53,7 @@ async function run() {
         await (0, utils_1.cleanRemoteFiles)();
         // Determine source: use source-theme if provided, otherwise use live theme
         // This controls WHERE we pull the JSON files FROM
-        const themeFlag = sourceThemeId ? `--theme ${sourceThemeId}` : '--live';
+        const themeFlag = sourceThemeId ? `--theme "${sourceThemeId}"` : '--live';
         const syncThemeInfo = sourceThemeId
             ? `theme ${sourceThemeId}`
             : 'live theme';
@@ -199,8 +199,7 @@ const sendFilesWithPathToShopify = async (files, { targetThemeId, store }) => {
     await execShellCommand(`shopify theme ${[
         'push',
         pushOnlyCommand,
-        '--theme',
-        targetThemeId,
+        `--theme "${targetThemeId}"`,
         '--store',
         store,
         '--verbose',

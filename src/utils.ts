@@ -133,8 +133,7 @@ export const sendFilesWithPathToShopify = async (
     `shopify theme ${[
       'push',
       pushOnlyCommand,
-      '--theme',
-      targetThemeId,
+      `--theme "${targetThemeId}"`,
       '--store',
       store,
       '--verbose',

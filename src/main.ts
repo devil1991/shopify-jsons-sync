@@ -34,7 +34,8 @@ async function run(): Promise<void> {
 
     // Determine source: use source-theme if provided, otherwise use live theme
     // This controls WHERE we pull the JSON files FROM
-    const themeFlag = sourceThemeId ? `--theme ${sourceThemeId}` : '--live'
+    const themeFlag = sourceThemeId ? `--theme "${sourceThemeId}"` : '--live'
+
     const syncThemeInfo = sourceThemeId
       ? `theme ${sourceThemeId}`
       : 'live theme'
@@ -42,7 +43,6 @@ async function run(): Promise<void> {
     debug(
       `Syncing JSON files from ${syncThemeInfo} to target theme ${targetThemeId}`
     )
-
     // STEP 1: Pull JSON files FROM the source theme (or live theme)
     await exec(
       `shopify theme pull --only config/*_data.json --only templates/**/*.json --only locales/*.json ${themeFlag} --path remote --store ${store} --verbose`,
